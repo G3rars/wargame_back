@@ -1,18 +1,31 @@
-  let createError = require('http-errors');
-  let express = require('express');
-  let path = require('path');
-  let cookieParser = require('cookie-parser');
-  let logger = require('morgan');
+  const createError = require('http-errors');
+  const express = require('express');
+  const path = require('path');
+  const cookieParser = require('cookie-parser');
+  const logger = require('morgan');
+  const swaggerUi = require('swagger-ui-express');
+  const swaggerSpec = require('./swagger');
+  const usersRoute = require('./routes/users.js')
 
   let app = express();
+
+
+  //app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
   app.use(logger('dev'));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
-  app.use(express.static(path.join(__dirname, 'public')));
 
-  //app.use('/', indexRouter);
+ // Rutas de la configuracion de swagger
+ // Redirigir '/' a '/api'
+  app.get('/', (req, res) => {
+    res.redirect('/api');
+  });
+  app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use('/users', usersRoute);
+  // rutas de la aplicacion
   //app.use('/users', usersRouter);
 
   // catch 404 and forward to error handler
