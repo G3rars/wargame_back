@@ -16,7 +16,49 @@ const router = express.Router();
 
 /* GET users listing. */
 router.get('/', function(req, res) {
-  res.json({'message': 'hola'})
+  const suma = 1 + 1;  
+  res.status(200).json({ message: suma });
+});
+
+/**
+ * @swagger
+ * /users /test:
+ *   post:
+ *     summary: Este endpoint es de prueba!
+ *     description: La prueba fue exitosa.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               numeroUno:
+ *                 type: integer
+ *               numeroDos:
+ *                 type: integer
+ *             required:
+ *               - numeroUno
+ *               - numeroDos 
+ *     responses:
+ *       200:
+ *         description: Esto devuelve de momento un Hola.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Error de servidor.
+ */
+
+/* POST test listing. */
+router.post('/test', function(req, res) {
+  const { numeroUno, numeroDos } = req.body;
+  const suma = numeroUno + numeroDos;
+  res.status(200).json({ message: `La suma es: ${suma}` });
 });
 
 module.exports = router;
