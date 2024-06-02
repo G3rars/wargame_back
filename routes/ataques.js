@@ -1,24 +1,7 @@
 let express = require('express');
 let router = express.Router();
-
-/**
- * @swagger
- * /ataques:
- *   get:
- *     summary: Este endpoint es de prueba!
- *     description: La prueba fue exitosa.
- *     responses:
- *       200:
- *         description: Esto debe traer el tablero.
- *       500:
- *         description: Error de servidor.   
- */
-
-/* GET users listing. */
-router.get('/', function(req, res) {
-    const mensaje = "Este es el tablero";  
-    res.status(200).json({ message: mensaje });
-  });
+const Tablero1 = require('../models/tablero1Model');
+const Tablero2 = require('../models/tablero2Model');
 
 /**
  * @swagger
@@ -33,15 +16,12 @@ router.get('/', function(req, res) {
  *           schema:
  *             type: object
  *             properties:
- *               modelCoord:
- *                 type: object
- *                 properties:
- *                   haveBase:
- *                     type: boolean
- *                     default: false
- *                   isAttacked:
- *                     type: boolean
- *                     default: false
+ *               tablero:
+ *                 type: integer
+ *                 description: Número del tablero (1 o 2)
+ *               position:
+ *                 type: string
+ *                 description: Coordenada a atacar (e.g., "A2")
  *     responses:
  *       200:
  *         description: Esto debe actualizar el tablero.
@@ -49,10 +29,36 @@ router.get('/', function(req, res) {
  *         description: Error de servidor.   
  */
 
-router.patch('/ataque', function(req, res) {
-    const ataque = "Es un ataque";  
-    res.status(200).json({ message: ataque });
-}); 
+router.patch('/ataque', async (req, res) => {
+    const { tablero, position } = req.body;
+
+    try {
+        let model;
+        if (tablero === 1) {
+            model = Tablero1;
+        } else if (tablero === 2) {
+            model = Tablero2;
+        } else {
+            return res.status(400).json({ error: 'Número de tablero no válido. Use 1 o 2.' });
+        }
+
+        // Encuentra la posición y actualiza isAttacked a true
+        const result = await model.findOneAndUpdate(
+            { position: position },
+            { $set: { isAttacked: true } },
+            { new: true }
+        );
+
+        if (!result) {
+            return res.status(404).json({ error: 'Posición no encontrada en el tablero.' });
+        }
+
+        res.status(200).json({ message: 'Posición actualizada correctamente', data: result });
+    } catch (error) {
+        console.error('Error al actualizar el tablero:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
 
 module.exports = router;
 
