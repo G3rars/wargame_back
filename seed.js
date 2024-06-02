@@ -1,7 +1,9 @@
+const mongoose = require('mongoose');
+const { Tablero1, Tablero2 } = require('./models/tableroModel.js');
 const connectToMongoDB = require('./connect'); // Importa la función para conectar a MongoDB
 
 // Datos de ejemplo para la semilla
-const seedData = [];
+const seedData = []
 
 // Definir las letras que queremos incluir
 const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -10,39 +12,31 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 for (let i = 0; i < letters.length; i++) {
     const letter = letters[i];
     for (let number = 1; number <= 6; number++) {
-        const key = letter + number;
-        const obj = {
-            [key]: {
-                haveBase: false,
-                hasAttacked: false
-            }
-        };
-        seedData.push(obj);
+        seedData.push({
+            position: letter + number,
+            haveBase: false,
+            hasAttacked: false
+        });
     }
 }
 
 async function seed() {
-    let client; // Declara la variable client fuera del bloque try
-
     try {
         // Conectar a la base de datos
-        client = await connectToMongoDB();
+        await connectToMongoDB();
 
-        // Obtener la referencia a la colección de usuarios
-        const collection = client.db().collection('tablero');
+        // Insertar los datos de ejemplo en la colección utilizando los modelos de Mongoose
+        const result1 = await Tablero1.insertMany(seedData);
+        console.log(`${result1.length} documentos insertados en tablero1`);
 
-        // Insertar los datos de ejemplo en la colección
-        const result = await collection.insertMany(seedData);
-        console.log(`${result.insertedCount} documentos insertados`);
-
+        const result2 = await Tablero2.insertMany(seedData);
+        console.log(`${result2.length} documentos insertados en tablero2`);
     } catch (error) {
         console.error('Error al insertar datos:', error);
     } finally {
-        if (client) {
-            // Cerrar la conexión a la base de datos si el cliente está definido
-            client.close();
-            console.log('Conexión cerrada');
-        }
+        // Cerrar la conexión a la base de datos
+        mongoose.connection.close();
+        console.log('Conexión cerrada');
     }
 }
 
