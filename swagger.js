@@ -4,9 +4,9 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Your API Title',
+      title: 'Api WarGame',
       version: '1.0.0',
-      description: 'API documentation for your Node.js application',
+      description: 'API documentation for wargame',
     },
   },
   apis: ['./models/*.js', './routes/*.js'], // Path to the API routes
