@@ -22,9 +22,7 @@ for (let i = 0; i < letters.length; i++) {
 
 async function seed() {
     try {
-        // Conectar a la base de datos
-        await connectToMongoDB();
-
+        
         // Insertar los datos de ejemplo en la colección utilizando los modelos de Mongoose
         const result1 = await Tablero1.insertMany(seedData);
         console.log(`${result1.length} documentos insertados en tablero1`);
@@ -33,11 +31,7 @@ async function seed() {
         console.log(`${result2.length} documentos insertados en tablero2`);
     } catch (error) {
         console.error('Error al insertar datos:', error);
-    } finally {
-        // Cerrar la conexión a la base de datos
-        mongoose.connection.close();
-        console.log('Conexión cerrada');
-    }
+    } 
 }
 
 module.exports = seed;

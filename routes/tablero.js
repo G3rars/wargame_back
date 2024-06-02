@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-
+const mongoSeed = require('../seed.js')
 // Modelos de mongoose, asegúrate de haberlos definido correctamente
 const { Tablero1, Tablero2 } = require('../models/tableroModel.js');
 
@@ -26,7 +26,6 @@ const { Tablero1, Tablero2 } = require('../models/tableroModel.js');
  *         description: Error de servidor.   
  */
 
-/* GET tablero. */
 router.get('/obtener', async (req, res) => {
     const { numero } = req.query;
 
@@ -109,41 +108,39 @@ router.patch('/cambiarBase', async (req, res) => {
     }
 });
 
-
-
 /**
  * @swagger
- * /api/tablero/crear:
+ * /tablero/resetearTablero:
  *   patch:
- *     summary: Creacion de tablero
+ *     summary: Este endpoint es de prueba!
  *     description: La prueba fue exitosa.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               modelCoord:
- *                 type: object
- *                 properties:
- *                   haveBase:
- *                     type: boolean
- *                     default: false
- *                   isAttacked:
- *                     type: boolean
- *                     default: false
  *     responses:
  *       200:
- *         description: Esto debe actualizar el tablero.
+ *         description: Esto debe reiniciar el tablero.
  *       500:
  *         description: Error de servidor.   
  */
 
-router.patch('tablero/crear', function (req, res) {
-    const ataque = "Es un ataque";
-    res.status(200).json({ message: ataque });
+router.patch('/resetearTablero', async (req, res) => {
+    try {
+        // Eliminar las colecciones de Tablero1 y Tablero2
+        await Tablero1.collection.drop();
+        await Tablero2.collection.drop();
+        await mongoSeed();
+
+        console.log("Semilla ejecutada exitosamente");
+        res.status(200).json({ message: 'Tableros reseteados correctamente' });
+    } catch (error) {
+        console.error('Error al resetear los tableros:', error);
+        
+        // Si ocurre un error porque la colección no existe, puedes ignorar ese error específico
+        if (error.message === 'ns not found') {
+            res.status(200).json({ message: 'Tableros ya estaban vacíos' });
+        } else {
+            res.status(500).json({ error: 'Error interno del servidor' });
+        }
+    }
 });
 
-module.exports = router;
 
+module.exports = router;
