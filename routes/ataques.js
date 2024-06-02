@@ -1,11 +1,10 @@
 let express = require('express');
 let router = express.Router();
-const Tablero1 = require('../models/tablero1Model');
-const Tablero2 = require('../models/tablero2Model');
+const { Tablero1, Tablero2 } = require('../models/tableroModel.js');
 
 /**
  * @swagger
- * /ataques/ataque:
+ * /ataque/jugador:
  *   patch:
  *     summary: Este endpoint es de prueba!
  *     description: La prueba fue exitosa.
@@ -29,7 +28,7 @@ const Tablero2 = require('../models/tablero2Model');
  *         description: Error de servidor.   
  */
 
-router.patch('/ataque', async (req, res) => {
+router.patch('/jugador', async (req, res) => {
     const { tablero, position } = req.body;
 
     try {
@@ -45,7 +44,7 @@ router.patch('/ataque', async (req, res) => {
         // Encuentra la posición y actualiza isAttacked a true
         const result = await model.findOneAndUpdate(
             { position: position },
-            { $set: { isAttacked: true } },
+            { $set: { hasAttacked: true } }, 
             { new: true }
         );
 
