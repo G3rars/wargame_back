@@ -48,6 +48,68 @@ router.get('/obtener', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /tablero/cambiarBase:
+ *   patch:
+ *     summary: Este endpoint es de prueba!
+ *     description: La prueba fue exitosa.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tablero:
+ *                 type: integer
+ *                 description: Número del tablero (1 o 2)
+ *               position:
+ *                 type: string
+ *                 description: Coordenada para instalar base (e.g., "A2")
+ *     responses:
+ *       200:
+ *         description: Esto debe intalar una base.
+ *       500:
+ *         description: Error de servidor.   
+ */
+
+router.patch('/cambiarBase', async (req, res) => {
+    const { tablero, position } = req.body;
+
+    try {
+        let model;
+        if (tablero === 1) {
+            model = Tablero1;
+        } else if (tablero === 2) {
+            model = Tablero2;
+        } else {
+            return res.status(400).json({ error: 'Número de tablero no válido. Use 1 o 2.' });
+        }
+
+        // Primero, encuentra el documento para obtener el valor actual de haveBase
+        const currentDocument = await model.findOne({ position: position });
+        if (!currentDocument) {
+            return res.status(404).json({ error: 'Posición no encontrada en el tablero.' });
+        }
+
+        const currentHaveBase = currentDocument.haveBase;
+
+        // Luego, alterna el valor de haveBase
+        const result = await model.findOneAndUpdate(
+            { position: position },
+            { $set: { haveBase: !currentHaveBase } }, 
+            { new: true }
+        );
+
+        res.status(200).json({ message: 'Base instalada correctamente', data: result });
+    } catch (error) {
+        console.error('Error al actualizar el tablero:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+
 
 /**
  * @swagger
