@@ -7,7 +7,7 @@ const swaggerSpec = require('./swagger');
 const cors = require('cors'); // Importa el paquete cors
 const usersRoute = require('./routes/users.js');
 const tableroRoute = require('./routes/tablero.js');
-// const ataquesRoute = require('./routes/ataques.js');
+const ataquesRoute = require('./routes/ataques.js');
 
 let app = express();
 
@@ -27,7 +27,7 @@ app.use('/docApi', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Rutas de la aplicación
 app.use('/users', usersRoute);
 app.use('/tablero', tableroRoute);
-// app.use('/ataques', ataquesRoute);
+app.use('/ataque', ataquesRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
